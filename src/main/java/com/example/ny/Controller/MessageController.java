@@ -24,7 +24,13 @@ public class MessageController {
     // --- CẤU HÌNH THÔNG TIN CƠ BẢN ---
     private final String tenChi = "Mai Linh";
     private final String tenEm = "Anh Duc";
-    private final String loiNhan = "From the moment we met, every day has felt brighter. Thank you for walking beside me, for your endless love and patience. Even with all my flaws, you chose to stay and love me. I love you more than words can say. Forever and always! \uD83E\uDEF6\n";
+    private final String loiNhan = "Hey my love,\n" +
+            "\n" +
+            "I built this little website just for you. I’ve actually had this idea since our very first date, and I'm so happy it's finally finished—though it took me a while to get the basics right.\n" +
+            "\n" +
+            "I know we've both been super busy lately, talking less and sharing less than we used to. But I wanted to change that for the better. Since you moved and started your new job, we don't get to talk every night like before, and I know your schedule is completely packed. I would never want to pressure you, but the truth is, I miss you a lot.\n" +
+            "\n" +
+            "One more thing—I know I tend to overthink sometimes, but please know that not for a single second have I ever thought about anyone else or considered cheating on you. I love you just as much as always.\uD83E\uDEF6\n";
     private final String myEmail = "ducdath04243@fpt.edu.vn";
 
     // 🔥 MẬT KHẨU ĐỂ VÀO TRANG
