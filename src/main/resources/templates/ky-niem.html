@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Những Khoảnh Khắc Của Chúng Mình</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #c2185b;
+      --secondary-color: #e91e63;
+      --background-color: #faf6f0;
+    }
+    body {
+      margin: 0; padding: 20px; font-family: 'Quicksand', sans-serif; display: flex;
+      justify-content: center; align-items: center; min-height: 100vh;
+      background-image: linear-gradient(to top, rgba(194, 24, 91, 0.3), rgba(0, 0, 0, 0.6)),
+      url('https://images.unsplash.com/photo-1502673530728-f79b41d2b5ea?q=80&w=2070&auto-format&fit=crop');
+      background-repeat: no-repeat; background-position: center center; background-size: cover;
+      backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+    }
+    .album-container {
+      background-color: var(--background-color); padding: 40px 50px; border-radius: 15px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); max-width: 1200px; width: 90%;
+      text-align: center; border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fade-in-up 1s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    h1 { font-family: 'Playfair Display', serif; font-size: 2.8em; color: var(--primary-color); margin-bottom: 15px; }
+    .subtitle { font-size: 1.1em; color: #777; margin-bottom: 40px; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
+    .gallery-item {
+      position: relative; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); cursor: pointer; opacity: 0;
+      animation: fade-in-up 0.8s forwards; transition: transform 0.4s ease, box-shadow 0.4s ease;
+      background-color: #fff; padding: 5px;
+    }
+    .gallery-item:hover { transform: translateY(-8px) scale(1.05); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); }
+    .gallery-item:nth-child(1) { animation-delay: 0.2s; }
+    .gallery-item:nth-child(2) { animation-delay: 0.3s; }
+    .gallery-item:nth-child(3) { animation-delay: 0.4s; }
+    .gallery-item:nth-child(4) { animation-delay: 0.5s; }
+    .gallery-item:nth-child(5) { animation-delay: 0.6s; }
+    .gallery-item:nth-child(6) { animation-delay: 0.7s; }
+    .gallery-item img {
+      width: 100%; height: 220px; object-fit: cover; display: block;
+      border-radius: 6px; transition: transform 0.4s ease, filter 0.4s ease;
+      filter: sepia(0.1) saturate(1.1);
+    }
+    .gallery-item:hover img { transform: scale(1.1); filter: sepia(0) saturate(1); }
+    .overlay {
+      position: absolute; top: 5px; left: 5px; width: calc(100% - 10px); height: calc(100% - 10px);
+      border-radius: 6px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      color: white; display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box;
+      opacity: 0; transition: opacity 0.4s ease; font-size: 0.9em;
+    }
+    .gallery-item:hover .overlay { opacity: 1; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; }
+    .modal-content { max-width: 90%; max-height: 80%; animation: zoom-in 0.5s forwards; }
+    #modalCaption { text-align: center; color: #ccc; padding: 15px 0; font-size: 1.2em; }
+    .close-button { position: absolute; top: 20px; right: 35px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
+    .close-button:hover { color: #bbb; }
+
+    /* --- CSS CHO CÁC NÚT ĐIỀU HƯỚNG --- */
+    .navigation-links {
+      display: flex; justify-content: center; gap: 15px;
+      border-top: 1px dashed #ccc; padding-top: 30px; margin-top: 10px;
+      flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+    }
+    .nav-button {
+      background-color: var(--secondary-color); color: white; border: none; padding: 12px 25px;
+      font-size: 1em; font-family: 'Quicksand', sans-serif; font-weight: bold;
+      border-radius: 50px; cursor: pointer; text-decoration: none;
+      transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .nav-button:hover {
+      background-color: var(--primary-color); transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .youtube-player-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; z-index: -1; }
+    @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes zoom-in { from { transform: scale(0.5); } to { transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+<div class="album-container">
+  <h1>Những Hình Ảnh Của Chị &#10084;</h1>
+  <p class="subtitle">Mỗi khoảnh khắc là một kỷ niệm ngọt ngào</p>
+
+  <div class="gallery">
+    <div class="gallery-item">
+      <img th:src="@{/img/anh1.jpg}" alt="Kỷ niệm 1">
+      <div class="overlay">Kỷ niệm 1</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh3.jpg}" alt="Kỷ niệm 2">
+      <div class="overlay">Kỷ niệm 2</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh4.jpg}" alt="Kỷ niệm 3">
+      <div class="overlay">Kỷ niệm 3</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh5.jpg}" alt="Kỷ niệm 4">
+      <div class="overlay">Kỷ niệm 4</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh6.jpg}" alt="Kỷ niệm 5">
+      <div class="overlay">Kỷ niệm 5</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh7.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 6</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh8.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 7</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh9.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 8</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh10.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 9</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh11.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 10</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh12.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 11</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh13.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 12</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh14.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 13</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh16.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 14</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh15.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 15</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh17.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 16</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh18.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 17</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh19.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 18</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh20.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 19</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh21.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 20</div>
+    </div>
+    <div class="gallery-item">
+    <img th:src="@{/img/anh22.jpg}" alt="Kỷ niệm 6">
+    <div class="overlay">Kỷ niệm 21</div>
+  </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh23.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 22</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh24.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 23</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh25.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 24</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh26.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 25</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh27.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 26</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh28.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 27</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh29.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 28</div>
+    </div>
+    <div class="gallery-item">
+      <img th:src="@{/img/anh31.jpg}" alt="Kỷ niệm 6">
+      <div class="overlay">Kỷ niệm 29</div>
+    </div>
+
+  </div>
+
+  <div class="navigation-links">
+    <a th:href="@{/gui-chi}" class="nav-button">Trang Thư</a>
+    <a th:href="@{/dem-ngay}" class="nav-button">Đếm Ngày Yêu</a>
+    <a th:href="@{/nghe-nhac}" class="nav-button">Nghe Nhạc</a>
+    <a th:href="@{/ghep-hinh}" class="nav-button">Ghép Hình Kỷ Niệm</a>
+    <a th:href="@{/vong-quay}" class="nav-button">Vòng Quay Yêu Thương</a>
+    <a th:href="@{/trac-nghiem}" class="nav-button">Trắc Nghiệm Tình Yêu</a>
+    <a th:href="@{/truth-or-dare}" class="nav-button">Sự Thật hay Thử Thách?</a>
+    <a th:href="@{/open-when}" class="nav-button">Mở khi</a>
+    <a th:href="@{/timeline}" class="nav-button">Timeline</a>
+    <a th:href="@{/love-map}" class="nav-button">Love-Map</a>
+    <a th:href="@{/safe}" class="nav-button">Két sắt</a>
+    <a th:href="@{/store}" class="nav-button">Cửa hàng</a>
+    <a th:href="@{/challenge}" class="nav-button">30 ngày</a>
+  </div>
+</div>
+
+<div class="youtube-player-hidden">
+  <iframe src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk&controls=0" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+</div>
+
+<div id="imageModal" class="modal">
+  <span class="close-button">&times;</span>
+  <img class="modal-content" id="modalImage">
+  <div id="modalCaption"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // ... (JavaScript không có gì thay đổi, giữ nguyên) ...
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const closeButton = document.querySelector('.close-button');
+    galleryItems.forEach(item => {
+      item.addEventListener('click', function() {
+        modal.style.display = "flex";
+        const img = this.querySelector('img');
+        modalImage.src = img.src;
+        modalCaption.textContent = img.alt;
+      });
+    });
+    function closeModal() { modal.style.display = "none"; }
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(event) { if (event.target === modal) { closeModal(); } });
+    document.addEventListener('keydown', function(event) { if (event.key === "Escape") { closeModal(); } });
+  });
+</script>
+
+</body>
+</html>
