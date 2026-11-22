@@ -23,6 +23,9 @@ import java.util.*;
 public class MessageController {
     @Autowired
     private com.example.ny.Respository.LetterRepository letterRepo;
+
+    @Autowired
+    private com.example.ny.Respository.SongRepository songRepo;
     @org.springframework.beans.factory.annotation.Value("${app.admin-password:}")
     private String adminPassword;
     // --- CẤU HÌNH THÔNG TIN CƠ BẢN ---
@@ -93,14 +96,24 @@ public class MessageController {
         }
 
         var letters = letterRepo.findAllByOrderByCreatedAtDesc();
-        // Nếu đã có thư trong database thì lấy bức mới nhất, chưa có thì hiện câu chào ngắn
         String noiDungHienThi = letters.isEmpty() ? "Chào bạn nhỏ, chúc cậu một ngày thật vui vẻ ❤️" : letters.get(0).getContent();
         String tieuDeHienThi = letters.isEmpty() ? "Every moment with you is a blessing" : letters.get(0).getTitle();
+
+        // Lấy bài hát mới nhất trong playlist bạn vừa thêm
+        var songs = songRepo.findAllByOrderByCreatedAtDesc();
+        String nhacNenUrl = songs.isEmpty()
+                ? "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                : songs.get(0).getAudioUrl();
+        String tenBaiHat = songs.isEmpty()
+                ? "Nhạc nền mặc định"
+                : songs.get(0).getTitle() + (songs.get(0).getArtist().isBlank() ? "" : " - " + songs.get(0).getArtist());
 
         model.addAttribute("tenNguoiNhan", tenChi);
         model.addAttribute("tenNguoiGui", tenEm);
         model.addAttribute("loiNhanYeuThuong", noiDungHienThi);
         model.addAttribute("tieuDeThu", tieuDeHienThi);
+        model.addAttribute("nhacNenUrl", nhacNenUrl);
+        model.addAttribute("tenBaiHat", tenBaiHat);
         return "letter";
     }
 

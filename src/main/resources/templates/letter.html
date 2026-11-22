@@ -378,9 +378,8 @@
     <div class="heart-float" style="left: 90%; animation-duration: 6.5s; animation-delay: 1.5s;"></div>
 </div>
 
-<audio id="christmas-audio" loop preload="auto">
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
+<audio id="christmas-audio" loop preload="auto" th:src="${nhacNenUrl}"></audio>
+<div id="yt-player-container" style="display:none;"></div>
 
 <div class="letter-container">
     <div class="heart-icon-main">💖</div>
@@ -453,7 +452,9 @@
         <div id="statusMessage"></div>
     </div>
 </div>
-
+<div id="music-badge" style="position: fixed; bottom: 38px; right: 95px; background: rgba(255,255,255,0.92); color: #d87093; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 700; box-shadow: 0 4px 12px rgba(255, 141, 161, 0.3); border: 1px solid #ffb6c1; z-index: 1001; max-width: 230px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    🎵 <span th:text="${tenBaiHat}">Nhạc nền</span>
+</div>
 <div id="volume-toggle">🔇</div>
 
 <div id="giftModal" class="modal">
@@ -468,26 +469,68 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // --- XỬ LÝ NHẠC NỀN ---
+        // --- XỬ LÝ NHẠC NỀN (HỖ TRỢ CẢ FILE MP3 VÀ LINK YOUTUBE) ---
         const audioPlayer = document.getElementById('christmas-audio');
         const volumeButton = document.getElementById('volume-toggle');
+        const rawUrl = audioPlayer ? audioPlayer.getAttribute('src') || '' : '';
         let isPlaying = false;
+        let ytPlayer = null;
 
-        if (volumeButton && audioPlayer) {
-            volumeButton.addEventListener('click', function() {
+        function getYouTubeId(url) {
+            const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?/\s]{11})/);
+            return match ? match[1] : null;
+        }
+
+        const ytVideoId = getYouTubeId(rawUrl);
+
+        if (ytVideoId) {
+            // Nếu bạn dán link YouTube -> dùng YouTube IFrame API phát ngầm
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            document.head.appendChild(tag);
+
+            window.onYouTubeIframeAPIReady = function() {
+                ytPlayer = new YT.Player('yt-player-container', {
+                    height: '0',
+                    width: '0',
+                    videoId: ytVideoId,
+                    playerVars: { autoplay: 0, loop: 1, playlist: ytVideoId }
+                });
+            };
+        }
+
+        function toggleMusic() {
+            if (ytVideoId && ytPlayer && typeof ytPlayer.playVideo === 'function') {
                 if (!isPlaying) {
-                    let playPromise = audioPlayer.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(_ => {
-                            volumeButton.textContent = '🔊';
-                            isPlaying = true;
-                        }).catch(error => { console.log("Audio play error: ", error); alert("Please tap the screen once, then click the speaker button again!"); });
-                    }
+                    ytPlayer.playVideo();
+                    volumeButton.textContent = '🔊';
+                    isPlaying = true;
+                } else {
+                    ytPlayer.pauseVideo();
+                    volumeButton.textContent = '🔇';
+                    isPlaying = false;
+                }
+                return;
+            }
+
+            if (!ytVideoId && audioPlayer) {
+                if (!isPlaying) {
+                    audioPlayer.play().then(() => {
+                        volumeButton.textContent = '🔊';
+                        isPlaying = true;
+                    }).catch(() => {
+                        alert("Bạn chạm vào màn hình một cái rồi bấm nút loa để nghe nhạc nhé!");
+                    });
                 } else {
                     audioPlayer.pause();
                     volumeButton.textContent = '🔇';
                     isPlaying = false;
                 }
-            });
+            }
+        }
+
+        if (volumeButton) {
+            volumeButton.addEventListener('click', toggleMusic);
         }
 
         // --- XỬ LÝ FORM GỬI LỜI NHẮN ---
