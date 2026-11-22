@@ -23,7 +23,8 @@ import java.util.*;
 public class MessageController {
     @Autowired
     private com.example.ny.Respository.LetterRepository letterRepo;
-
+    @org.springframework.beans.factory.annotation.Value("${app.admin-password:}")
+    private String adminPassword;
     // --- CẤU HÌNH THÔNG TIN CƠ BẢN ---
     private final String tenChi = "Nguyễn Thùy Dương";
     private final String tenEm = "Anh Duc";
@@ -52,13 +53,22 @@ public class MessageController {
 
     @PostMapping("/login")
     public String handleLogin(@RequestParam("password") String password, HttpSession session, Model model) {
+        // 1. Mật khẩu của cô ấy (27092010) -> vào trang đọc thư /gui-chi
         if (PASSWORD.equals(password)) {
             session.setAttribute("isLoggedIn", true);
             return "redirect:/gui-chi";
-        } else {
-            model.addAttribute("error", "Sai mật khẩu rồi! Gợi ý: Ngày sinh nhật hoặc kỷ niệm 🎂");
-            return "login";
         }
+
+        // 2. Mật khẩu của bạn (ADMIN_PASSWORD trên Koyeb) -> vào thẳng trang quản trị /anh-viet-thu
+        if (adminPassword != null && !adminPassword.isBlank() && adminPassword.equals(password)) {
+            session.setAttribute("isAdmin", true);
+            session.setAttribute("isLoggedIn", true); // Cho phép bạn xem luôn trang /gui-chi nếu muốn
+            return "redirect:/anh-viet-thu";
+        }
+
+        // 3. Nhập sai mật khẩu
+        model.addAttribute("error", "Sai mật khẩu rồi! Kiểm tra lại nhé 🎂");
+        return "login";
     }
 
     @GetMapping("/logout")
