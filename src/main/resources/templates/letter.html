@@ -386,11 +386,11 @@
     <div class="heart-icon-main">💖</div>
 
     <h1>For My Love</h1>
-    <h2>Every moment with you is a blessing</h2>
+    <h2 th:text="${tieuDeThu}">Every moment with you is a blessing</h2>
 
     <div class="content-wrapper">
         <p>Dear <b><span th:text="${tenNguoiNhan}"></span></b>,</p>
-        <p class="message" th:utext="${loiNhanYeuThuong}">Thank you for always being by my side and sharing every joy and sorrow in life. May our love stay sweet and strong just like the very first day! ❤️</p>
+        <p class="message" style="white-space: pre-wrap;" th:text="${loiNhanYeuThuong}">...</p>
         <p class="signature">Yours,<br><span th:text="${tenNguoiGui}"></span> ✨</p>
     </div>
 

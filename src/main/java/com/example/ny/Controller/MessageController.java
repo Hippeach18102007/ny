@@ -19,18 +19,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
+
 public class MessageController {
+    @Autowired
+    private com.example.ny.Respository.LetterRepository letterRepo;
 
     // --- CẤU HÌNH THÔNG TIN CƠ BẢN ---
     private final String tenChi = "Nguyễn Thùy Dương";
     private final String tenEm = "Anh Duc";
-    private final String loiNhan = "Chào bạn nhỏ,\n" +
-            "\n" +
-            "I built this little website just for you. I’ve actually had this idea since our very first date, and I'm so happy it's finally finished—though it took me a while to get the basics right.\n" +
-            "\n" +
-            "I know we've both been super busy lately, talking less and sharing less than we used to. But I wanted to change that for the better. Since you moved and started your new job, we don't get to talk every night like before, and I know your schedule is completely packed. I would never want to pressure you, but the truth is, I miss you a lot.\n" +
-            "\n" +
-            "One more thing—I know I tend to overthink sometimes, but please know that not for a single second have I ever thought about anyone else or considered cheating on you. I love you just as much as always. \uD83E\uDEF6\n";
     private final String myEmail = "ducdath04243@fpt.edu.vn";
 
     // 🔥 MẬT KHẨU ĐỂ VÀO TRANG
@@ -73,15 +69,24 @@ public class MessageController {
 
     // --- 2. TRANG THƯ ---
 
+
+
+    // --- 2. TRANG THƯ ---
     @GetMapping("/gui-chi")
     public String showLetter(Model model, HttpSession session) {
         if (session.getAttribute("isLoggedIn") == null) {
             return "redirect:/login";
         }
 
+        var letters = letterRepo.findAllByOrderByCreatedAtDesc();
+        // Nếu đã có thư trong database thì lấy bức mới nhất, chưa có thì hiện câu chào ngắn
+        String noiDungHienThi = letters.isEmpty() ? "Chào bạn nhỏ, chúc cậu một ngày thật vui vẻ ❤️" : letters.get(0).getContent();
+        String tieuDeHienThi = letters.isEmpty() ? "Every moment with you is a blessing" : letters.get(0).getTitle();
+
         model.addAttribute("tenNguoiNhan", tenChi);
         model.addAttribute("tenNguoiGui", tenEm);
-        model.addAttribute("loiNhanYeuThuong", loiNhan);
+        model.addAttribute("loiNhanYeuThuong", noiDungHienThi);
+        model.addAttribute("tieuDeThu", tieuDeHienThi);
         return "letter";
     }
 
