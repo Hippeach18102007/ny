@@ -60,7 +60,10 @@ public class LetterController {
 
     @GetMapping("/anh-viet-thu")
     public String adminPage(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login?role=boy";
+        if (!isAdmin(session)) {
+            model.addAttribute("isAdmin", false);
+            return "admin-letters";
+        }
         model.addAttribute("isAdmin", true);
         model.addAttribute("letters", letterRepo.findAllByOrderByCreatedAtDesc());
         model.addAttribute("photos", photoRepo.findAllByOrderByCreatedAtDesc());
@@ -74,13 +77,13 @@ public class LetterController {
             session.setAttribute("isAdmin", true);
             return "redirect:/anh-viet-thu";
         }
-        return "redirect:/login?adminErr=1";
+        return "redirect:/anh-viet-thu?err=pass";
     }
 
     @GetMapping("/anh-viet-thu/logout")
     public String adminLogout(HttpSession session) {
         session.removeAttribute("isAdmin");
-        return "redirect:/login?role=boy";
+        return "redirect:/anh-viet-thu";
     }
 
     // --- 1. QUẢN LÝ THƯ ---
