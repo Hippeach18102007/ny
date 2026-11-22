@@ -53,20 +53,24 @@ public class MessageController {
 
     @PostMapping("/login")
     public String handleLogin(@RequestParam("password") String password, HttpSession session, Model model) {
-        // 1. Mật khẩu của cô ấy (27092010) -> vào trang đọc thư /gui-chi
+        // Xóa sạch quyền cũ trước khi kiểm tra mật khẩu mới
+        session.removeAttribute("isAdmin");
+        session.removeAttribute("isLoggedIn");
+
+        // 1. Chỉ mật khẩu của cô ấy (27092010) mới vào được trang đọc thư
         if (PASSWORD.equals(password)) {
             session.setAttribute("isLoggedIn", true);
             return "redirect:/gui-chi";
         }
 
-        // 2. Mật khẩu của bạn (ADMIN_PASSWORD trên Koyeb) -> vào thẳng trang quản trị /anh-viet-thu
-        if (adminPassword != null && !adminPassword.isBlank() && adminPassword.equals(password)) {
+        // 2. Chỉ khi biến ADMIN_PASSWORD trên Koyeb có giá trị VÀ khớp từng ký tự mới vào được For Him
+        if (adminPassword != null && !adminPassword.trim().isEmpty() && adminPassword.trim().equals(password)) {
             session.setAttribute("isAdmin", true);
-            session.setAttribute("isLoggedIn", true); // Cho phép bạn xem luôn trang /gui-chi nếu muốn
+            session.setAttribute("isLoggedIn", true);
             return "redirect:/anh-viet-thu";
         }
 
-        // 3. Nhập sai mật khẩu
+        // 3. Nhập sai -> báo lỗi và giữ nguyên ở trang login
         model.addAttribute("error", "Sai mật khẩu rồi! Kiểm tra lại nhé 🎂");
         return "login";
     }
