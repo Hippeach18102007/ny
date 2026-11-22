@@ -172,6 +172,27 @@
             display: block;
             font-weight: 600;
         }
+        /* Tabs chọn người đăng nhập */
+        .tabs { display: flex; gap: 10px; margin-bottom: 22px; }
+        .tabs .tab {
+            flex: 1; width: auto; padding: 12px 8px; font-size: 15px;
+            background: #fff; color: #ff4757; border: 2px solid #ffccd5;
+            box-shadow: none; transform: none;
+        }
+        .tabs .tab:not(.active):hover { background: #fff0f3; transform: none; box-shadow: none; }
+        .tabs .tab.active,
+        .tabs .tab.active:hover {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            color: #fff; border-color: transparent; transform: none;
+        }
+        .btn-him {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        .btn-him:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            box-shadow: 0 12px 25px rgba(59, 130, 246, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -189,17 +210,50 @@
 <div class="login-card">
     <div class="icon-lock">💖</div>
     <h1>Love Code</h1>
-    <p>Please enter our anniversary date (or the password I gave you) to open this special letter!</p>
 
-    <form action="/login" method="post">
-        <div class="input-group">
-            <input type="password" name="password" placeholder="Enter secret password..." required>
-        </div>
-        <button type="submit">Unlock Our Love ❤️</button>
+    <div class="tabs">
+        <button type="button" class="tab active" data-target="her">👩 For Her</button>
+        <button type="button" class="tab" data-target="him">👨 For Him</button>
+    </div>
 
-        <span class="error" th:if="${error}" th:text="${error}"></span>
-    </form>
+    <!-- Phần của bạn nữ -->
+    <div class="panel" id="panel-her">
+        <p>Please enter our anniversary date (or the password I gave you) to open this special letter!</p>
+        <form action="/login" method="post">
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Enter secret password..." required>
+            </div>
+            <button type="submit">Unlock Our Love ❤️</button>
+            <span class="error" th:if="${error}" th:text="${error}"></span>
+        </form>
+    </div>
+
+    <!-- Phần của bạn nam -->
+    <div class="panel" id="panel-him" style="display:none">
+        <p>Your desk for writing love letters to her.</p>
+        <form action="/anh-viet-thu/login" method="post">
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Your secret password..." required>
+            </div>
+            <button type="submit" class="btn-him">Open Letter Desk 💙</button>
+            <span class="error" th:if="${param.adminErr}">Wrong password!</span>
+        </form>
+    </div>
 </div>
+<script>
+    const tabs = document.querySelectorAll('.tab');
 
+    function showTab(name) {
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.target === name));
+        document.getElementById('panel-her').style.display = name === 'her' ? 'block' : 'none';
+        document.getElementById('panel-him').style.display = name === 'him' ? 'block' : 'none';
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => showTab(t.dataset.target)));
+
+    // Quay lại từ trang của anh / sai mật khẩu của anh -> mở sẵn tab "For Him"
+    const q = new URLSearchParams(location.search);
+    if (q.has('adminErr') || q.get('role') === 'boy') showTab('him');
+</script>
 </body>
 </html>

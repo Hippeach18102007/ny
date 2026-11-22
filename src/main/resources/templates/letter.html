@@ -175,6 +175,7 @@
             box-shadow: 0 5px 15px rgba(255, 141, 161, 0.4);
         }
 
+
         #submitButton:hover, #gift-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 141, 161, 0.6);
@@ -334,6 +335,7 @@
             margin-bottom: 15px;
         }
 
+
         .gift-image {
             max-width: 150px;
             height: auto;
@@ -355,6 +357,14 @@
             border: 2px solid white; box-shadow: 0 5px 15px rgba(255, 141, 161, 0.4);
         }
         #volume-toggle:hover { transform: scale(1.1); }
+        /* Tâm thư từ anh */
+        .letters-section { margin-top: 30px; border-top: 1px dashed #ffccd5; padding-top: 25px; text-align: left; }
+        .letters-section h2 { text-align: center; font-size: 1.4em; margin-bottom: 15px; }
+        .letter-card { background: #fffafa; border-left: 4px solid var(--primary-color); border-radius: 15px; padding: 18px 20px; margin-bottom: 18px; }
+        .letter-card h3 { font-family: 'Playfair Display', serif; color: var(--primary-color); margin: 0 0 4px; }
+        .letter-date { font-size: 0.8em; color: #aaa; margin-bottom: 10px; }
+        .letter-text { white-space: pre-wrap; line-height: 1.8; color: var(--text-color); font-weight: 500; }
+        .letter-card img { max-width: 100%; border-radius: 12px; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -427,6 +437,10 @@
         <a th:href="@{/shooter}" class="memory-button">Shooter Game</a>
         <a th:href="@{/gacha}" class="memory-button">Gacha Pull</a>
         <a th:href="@{/cycle}" class="memory-button">Cycle Tracker</a>
+    </div>
+    <div class="letters-section">
+        <h2>Letters from me 💌</h2>
+        <div id="letters-list">Loading letters...</div>
     </div>
 
     <div class="reply-section">
@@ -506,7 +520,43 @@
                     });
             });
         }
+// --- ĐỌC TÂM THƯ TỪ ANH ---
+        const lettersList = document.getElementById('letters-list');
+        if (lettersList) {
+            fetch('/api/letters')
+                .then(r => r.ok ? r.json() : Promise.reject(r))
+                .then(letters => {
+                    lettersList.textContent = '';
+                    if (!letters.length) {
+                        lettersList.textContent = 'No letters yet, check back soon 💕';
+                        return;
+                    }
+                    letters.forEach(l => {
+                        const card = document.createElement('div');
+                        card.className = 'letter-card';
 
+                        const h = document.createElement('h3');
+                        h.textContent = l.title;
+                        const d = document.createElement('div');
+                        d.className = 'letter-date';
+                        d.textContent = l.createdAt;
+                        const t = document.createElement('div');
+                        t.className = 'letter-text';
+                        t.textContent = l.content;
+                        card.append(h, d, t);
+
+                        if (l.imageUrl) {
+                            const img = document.createElement('img');
+                            img.src = l.imageUrl;
+                            img.loading = 'lazy';
+                            img.alt = '';
+                            card.appendChild(img);
+                        }
+                        lettersList.appendChild(card);
+                    });
+                })
+                .catch(() => { lettersList.textContent = 'Could not load letters 😢'; });
+        }
         // --- LÝ DO YÊU / LỜI NHẮN NGỌT NGÀO ---
         const reasonButton = document.getElementById('reason-button');
         const reasonDisplay = document.getElementById('reason-display');

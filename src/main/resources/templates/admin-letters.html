@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Góc Riêng Của Anh — Quản Lý Nội Dung</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: #fdf2f5; color: #333; margin: 0; padding: 20px; }
+    .container { max-width: 850px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header h2 { color: #d6336c; margin: 0; }
+    .btn-logout { background: #6c757d; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; }
+
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #fff; color: #d6336c; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .tab-btn.active { background: #d6336c; color: #fff; }
+
+    .card { background: #fff; padding: 20px; border-radius: 14px; box-shadow: 0 4px 12px rgba(214,51,108,0.08); margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+    input[type="text"], textarea, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #f3c6d3; border-radius: 8px; font-size: 14px; }
+    textarea { min-height: 140px; resize: vertical; }
+    .btn-submit { background: #d6336c; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
+    .btn-submit:hover { background: #b82557; }
+
+    .item-list { display: flex; flex-direction: column; gap: 12px; }
+    .item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #f8d7e0; border-radius: 10px; gap: 12px; }
+    .item img { width: 65px; height: 65px; object-fit: cover; border-radius: 8px; }
+    .item-info { flex: 1; }
+    .item-title { font-weight: bold; color: #c2255c; }
+    .item-sub { font-size: 13px; color: #666; margin-top: 4px; }
+    .btn-del { background: #ff4d4f; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>💌 Góc Riêng Của Anh</h2>
+    <a href="/anh-viet-thu/logout" class="btn-logout">Đăng xuất</a>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('letters', this)">✍️ Viết Thư</button>
+    <button class="tab-btn" onclick="switchTab('photos', this)">📸 Lưu Ảnh</button>
+    <button class="tab-btn" onclick="switchTab('songs', this)">🎵 Chọn Nhạc</button>
+  </div>
+
+  <!-- TAB 1: VIẾT THƯ -->
+  <div id="tab-letters" class="tab-content">
+    <div class="card">
+      <form action="/anh-viet-thu/dang" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Tiêu đề thư</label>
+          <input type="text" name="title" placeholder="VD: Gửi em ngày mưa..." required>
+        </div>
+        <div class="form-group">
+          <label>Nội dung tâm sự</label>
+          <textarea name="content" placeholder="Viết những điều anh muốn nói..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Ảnh đính kèm (không bắt buộc)</label>
+          <input type="file" name="image" accept="image/*">
+        </div>
+        <button type="submit" class="btn-submit">Gửi Thư Lên Web</button>
+      </form>
+    </div>
+
+    <div class="card item-list">
+      <div class="item" th:each="l : ${letters}">
+        <img th:if="${l.imageFile != null}" th:src="@{'/uploads/' + ${l.imageFile}}" alt="ảnh thư">
+        <div class="item-info">
+          <div class="item-title" th:text="${l.title}">Tiêu đề</div>
+          <div class="item-sub" th:text="${l.createdAtText}">Ngày đăng</div>
+        </div>
+        <form th:action="@{'/anh-viet-thu/xoa/' + ${l.id}}" method="post">
+          <button type="submit" class="btn-del" onclick="return confirm('Xóa bức thư này?')">Xóa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: LƯU ẢNH -->
+  <div id="tab-photos" class="tab-content hidden">
+    <div class="card">
+      <form action="/anh-viet-thu/anh/them" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Chọn ảnh kỷ niệm</label>
+          <input type="file" name="image" accept="image/*" required>
+        </div>
+        <div class="form-group">
+          <label>Lời nhắn / Kỷ niệm</label>
+          <input type="text" name="caption" placeholder="VD: Lần đầu đi Đà Lạt cùng nhau">
+        </div>
+        <div class="form-group">
+          <label>Ngày chụp</label>
+          <input type="text" name="memoryDate" placeholder="VD: 20/10/2026">
+        </div>
+        <button type="submit" class="btn-submit">Lưu Ảnh Vào Album</button>
+      </form>
+    </div>
+
+    <div class="card item-list">
+      <div class="item" th:each="p : ${photos}">
+        <img th:src="@{'/uploads/' + ${p.imageFile}}" alt="kỷ niệm">
+        <div class="item-info">
+          <div class="item-title" th:text="${p.caption != '' ? p.caption : 'Ảnh kỷ niệm'}">Caption</div>
+          <div class="item-sub" th:text="${p.memoryDate}">Ngày</div>
+        </div>
+        <form th:action="@{'/anh-viet-thu/anh/xoa/' + ${p.id}}" method="post">
+          <button type="submit" class="btn-del" onclick="return confirm('Xóa ảnh này?')">Xóa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: CHỌN NHẠC -->
+  <div id="tab-songs" class="tab-content hidden">
+    <div class="card">
+      <form action="/anh-viet-thu/nhac/them" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Tên bài hát</label>
+          <input type="text" name="title" placeholder="VD: Nơi Này Có Anh" required>
+        </div>
+        <div class="form-group">
+          <label>Ca sĩ</label>
+          <input type="text" name="artist" placeholder="VD: Sơn Tùng M-TP">
+        </div>
+        <div class="form-group">
+          <label>Cách 1: Dán link nhạc (MP3 trực tiếp hoặc link YouTube)</label>
+          <input type="text" name="link" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>Cách 2: Hoặc tải file nhạc (.mp3, .m4a) từ máy lên</label>
+          <input type="file" name="audioFile" accept="audio/*">
+        </div>
+        <button type="submit" class="btn-submit">Thêm Vào Playlist</button>
+      </form>
+    </div>
+
+    <div class="card item-list">
+      <div class="item" th:each="s : ${songs}">
+        <div class="item-info">
+          <div class="item-title" th:text="${s.title}">Tên bài</div>
+          <div class="item-sub" th:text="${s.artist + (s.localFile ? ' (File tải lên)' : ' (Link ngoài)')}">Ca sĩ</div>
+        </div>
+        <form th:action="@{'/anh-viet-thu/nhac/xoa/' + ${s.id}}" method="post">
+          <button type="submit" class="btn-del" onclick="return confirm('Xóa bài hát này?')">Xóa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabName, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.remove('hidden');
+    btn.classList.add('active');
+  }
+
+  // Tự động mở đúng tab sau khi submit form
+  const params = new URLSearchParams(window.location.search);
+  const activeTab = params.get('tab');
+  if (activeTab) {
+    const index = activeTab === 'photos' ? 1 : (activeTab === 'songs' ? 2 : 0);
+    const btns = document.querySelectorAll('.tab-btn');
+    if (btns[index]) switchTab(activeTab, btns[index]);
+  }
+</script>
+</body>
+</html>
