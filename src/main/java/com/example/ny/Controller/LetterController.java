@@ -45,12 +45,13 @@ public class LetterController {
         this.adminPassword = adminPassword;
     }
 
-    private boolean isAdmin(HttpSession s) { return s.getAttribute("isAdmin") != null; }
-
-    private boolean canRead(HttpSession s) {
-        return s.getAttribute("isLoggedIn") != null || isAdmin(s);
+    private boolean isAdmin(HttpSession s) {
+        return Boolean.TRUE.equals(s.getAttribute("isAdmin"));
     }
 
+    private boolean canRead(HttpSession s) {
+        return Boolean.TRUE.equals(s.getAttribute("isLoggedIn")) || isAdmin(s);
+    }
     private static String extOf(String name) {
         if (name == null || !name.contains(".")) return "";
         return name.substring(name.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
@@ -60,9 +61,9 @@ public class LetterController {
 
     @GetMapping("/anh-viet-thu")
     public String adminPage(HttpSession session, Model model) {
+        // Chưa đăng nhập đúng mật khẩu admin -> đuổi thẳng về trang /login
         if (!isAdmin(session)) {
-            model.addAttribute("isAdmin", false);
-            return "admin-letters";
+            return "redirect:/login";
         }
         model.addAttribute("isAdmin", true);
         model.addAttribute("letters", letterRepo.findAllByOrderByCreatedAtDesc());
@@ -73,17 +74,18 @@ public class LetterController {
 
     @PostMapping("/anh-viet-thu/login")
     public String adminLogin(@RequestParam("password") String password, HttpSession session) {
-        if (!adminPassword.isBlank() && adminPassword.equals(password)) {
+        if (adminPassword != null && !adminPassword.trim().isEmpty() && adminPassword.trim().equals(password)) {
             session.setAttribute("isAdmin", true);
+            session.setAttribute("isLoggedIn", true);
             return "redirect:/anh-viet-thu";
         }
-        return "redirect:/anh-viet-thu?err=pass";
+        return "redirect:/login?adminErr=1";
     }
 
     @GetMapping("/anh-viet-thu/logout")
     public String adminLogout(HttpSession session) {
-        session.removeAttribute("isAdmin");
-        return "redirect:/anh-viet-thu";
+        session.invalidate();
+        return "redirect:/login";
     }
 
     // --- 1. QUẢN LÝ THƯ ---
