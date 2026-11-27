@@ -7,7 +7,9 @@ import com.example.ny.Respository.LetterRepository;
 import com.example.ny.Respository.MemoryPhotoRepository;
 import com.example.ny.Respository.SongRepository;
 import com.example.ny.Service.CloudinaryService;
+import com.example.ny.Service.EmailService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,8 @@ import java.util.Set;
 
 @Controller
 public class LetterController {
-
+    @Autowired
+    private EmailService emailService;
     private static final Set<String> ALLOWED_IMG = Set.of("jpg", "jpeg", "png", "gif", "webp");
     private static final Set<String> ALLOWED_AUDIO = Set.of("mp3", "m4a", "wav", "ogg");
 
@@ -114,6 +117,7 @@ public class LetterController {
         }
 
         letterRepo.save(letter);
+        emailService.sendNewLetterNotification(letter.getTitle(), letter.getContent());
         return "redirect:/anh-viet-thu?tab=letters";
     }
 
@@ -224,4 +228,5 @@ public class LetterController {
                 .map(s -> new SongDto(s.getId(), s.getTitle(), s.getArtist(), s.getAudioUrl()))
                 .toList());
     }
+
 }

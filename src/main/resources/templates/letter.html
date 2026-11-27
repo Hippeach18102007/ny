@@ -183,6 +183,7 @@
         }
 
         /* KHÓA NÚT "WHY I LOVE YOU" */
+        /* MỞ KHÓA NÚT "WHY I LOVE YOU" */
         #reason-button {
             background: linear-gradient(135deg, #ffb6c1 0%, #ff8da1 100%);
             color: white;
@@ -192,47 +193,50 @@
             font-family: 'Quicksand', sans-serif;
             font-weight: 700;
             border-radius: 30px;
-            box-shadow: 0 5px 15px rgba(255, 141, 161, 0.2);
-            pointer-events: none;
-            opacity: 0.6;
-            cursor: not-allowed;
+            box-shadow: 0 5px 15px rgba(255, 141, 161, 0.35);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #reason-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 141, 161, 0.55);
         }
 
-        #reason-display {
-            font-size: 1.2em;
-            color: var(--primary-color);
-            min-height: 50px;
-            transition: opacity 0.4s;
-            margin-top: 15px;
-            font-weight: 600;
+        /* LƯỚI 6 MỤC CHÍNH GỌN ĐẸP & MỞ KHÓA BẤM */
+        .memories-link {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 30px;
+            padding-bottom: 20px;
         }
-        #reason-display.fade { opacity: 0; }
 
-        /* KHÓA TOÀN BỘ DANH SÁCH NÚT BÊN DƯỚI */
         .memory-button {
             background-color: #fff;
             color: var(--primary-color);
             border: 1.5px solid #ffb6c1;
-            padding: 8px 18px;
-            font-size: 0.9em;
+            padding: 14px 16px;
+            font-size: 0.95em;
             font-family: 'Quicksand', sans-serif;
-            font-weight: 600;
-            border-radius: 20px;
+            font-weight: 700;
+            border-radius: 18px;
             text-decoration: none;
-            transition: all 0.3s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            pointer-events: none;
-            opacity: 0.6;
-            cursor: not-allowed;
+            transition: all 0.25s;
+            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .memories-link {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
-            padding-bottom: 20px;
-            flex-wrap: wrap;
+        .memory-button:hover {
+            background: linear-gradient(135deg, #fff0f3 0%, #ffe3e8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(255, 141, 161, 0.3);
+        }
+
+        @media (max-width: 480px) {
+            .memories-link { grid-template-columns: 1fr; }
         }
 
         .reply-section {
@@ -403,39 +407,12 @@
     </div>
 
     <div class="memories-link">
-        <a th:href="@{/dem-ngay}" class="memory-button">Countdown 💖</a>
-        <a th:href="@{/ky-niem}" class="memory-button">Photo Album 📸</a>
-        <a th:href="@{/nghe-nhac}" class="memory-button">Music 🎶</a>
-        <a th:href="@{/vong-quay}" class="memory-button">Lucky Wheel 🎁</a>
-        <a th:href="@{/ghep-hinh}" class="memory-button">Puzzle</a>
-        <a th:href="@{/mon-an}" class="memory-button">Food Picker 🍲</a>
-        <a th:href="@{/bai-hoc}" class="memory-button">Sweet Notes</a>
-        <a th:href="@{/tro-choi-nho}" class="memory-button">Memory Game</a>
-        <a th:href="@{/trac-nghiem}" class="memory-button">Love Quiz</a>
-        <a th:href="@{/truth-or-dare}" class="memory-button">Truth or Dare</a>
-        <a th:href="@{/thoi-tiet}" class="memory-button">Weather ☀️</a>
-        <a th:href="@{/open-when}" class="memory-button">Open When...</a>
-        <a th:href="@{/timeline}" class="memory-button">Timeline</a>
-        <a th:href="@{/love-map}" class="memory-button">Love Map</a>
-        <a th:href="@{/safe}" class="memory-button">Safe Box</a>
-        <a th:href="@{/store}" class="memory-button">Store</a>
-        <a th:href="@{/challenge}" class="memory-button">30 Days</a>
-        <a th:href="@{/lixi}" class="memory-button">Lucky Money</a>
-        <a th:href="@{/game-kho}" class="memory-button">Hard Game</a>
-        <a th:href="@{/game-piano}" class="memory-button">Piano Game</a>
-        <a th:href="@{/game-2048}" class="memory-button">2048</a>
-        <a th:href="@{/game-snake}" class="memory-button">Snake Game</a>
-        <a th:href="@{/garden}" class="memory-button">Garden</a>
-        <a th:href="@{/pharmacy}" class="memory-button">Pharmacy</a>
-        <a th:href="@{/heart-game}" class="memory-button">Heart Game</a>
-        <a th:href="@{/catch-game}" class="memory-button">Catch Game</a>
-        <a th:href="@{/ticket}" class="memory-button">Love Ticket</a>
-        <a th:href="@{/tarot}" class="memory-button">Tarot</a>
-        <a th:href="@{/kitchen}" class="memory-button">Kitchen</a>
-        <a th:href="@{/star}" class="memory-button">🌟 Wishing Star</a>
-        <a th:href="@{/shooter}" class="memory-button">Shooter Game</a>
-        <a th:href="@{/gacha}" class="memory-button">Gacha Pull</a>
-        <a th:href="@{/cycle}" class="memory-button">Cycle Tracker</a>
+        <a th:href="@{/ky-niem}" class="memory-button">📸 Kỷ Niệm & Đếm Ngày</a>
+        <a th:href="@{/nghe-nhac}" class="memory-button">🎶 Góc Nhạc & Lời Nhắn</a>
+        <a th:href="@{/mon-an}" class="memory-button">🍲 Hôm Nay Ăn Gì & Hẹn Hò</a>
+        <a th:href="@{/trac-nghiem}" class="memory-button">🎲 Trò Chơi Hai Đứa</a>
+        <a th:href="@{/vong-quay}" class="memory-button">🎁 Hộp Quà & Điều Ước</a>
+        <a th:href="@{/garden}" class="memory-button">🌱 Vườn Cây & Chữa Lành</a>
     </div>
     <div class="letters-section">
         <h2>Letters from me 💌</h2>

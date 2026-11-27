@@ -62,4 +62,24 @@ public class EmailService {
             throw new RuntimeException("Failed to send email", e);
         }
     }
+
+    public void sendNewLetterNotification(String title, String content) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(FROM_EMAIL); // Bắt buộc phải có để Brevo không chặn gửi
+            message.setTo("tduongxinhgai3@gmail.com");
+            message.setSubject("💌 Bạn lớn vừa gửi cho cậu một bức thư mới nè!");
+            message.setText(
+                    "Chào Thùy Dương (bạn nhỏ) 💕,\n\n" +
+                            "Bạn lớn vừa viết một bức thư mới trên web dành riêng cho cậu:\n" +
+                            "📌 Tiêu đề: " + title + "\n\n" +
+                            "Vào web đọc trọn vẹn bức thư và nghe nhạc nhé!\n" +
+                            "Link web: https://initial-barbee-duc18102007-hippeach-f2b51271.koyeb.app/"
+            );
+            mailSender.send(message);
+            System.out.println("Đã gửi email thông báo thư mới cho Thùy Dương!");
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi email thông báo cho Thùy Dương: " + e.getMessage());
+        }
+    }
 }
